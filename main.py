@@ -1,6 +1,5 @@
 def main():
-    a = get_reading()
-    print(a.humidity())
+  print(get_reading())
 
 
 def get_reading():
@@ -11,18 +10,20 @@ class Reading:
     _humidity = -1
     _temperature = -1
 
-    def __new__(self, h, t):
+    def __init__(self, h, t):
         self._humidity = h
         self._temperature = t
-        return self
 
     def humidity(self):
         return self._humidity
 
     def temperature(self):
         return self._temperature
+        
+    def __repr__(self):
+        return f"Reading({self._humidity}, {self._temperature})"
     
-    def a_func(self):
+    def __str__(self):
         return f"{self._humidity}%, {self._temperature}° C"
 
 
