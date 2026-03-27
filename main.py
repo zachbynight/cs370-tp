@@ -1,5 +1,13 @@
+import server
+import client
+import sys
+
+
 def main():
-  print(get_reading())
+    if sys.argv[1] == "s":
+        server.start()
+    elif sys.argv[1] == "c":
+        client.start()
 
 
 def get_reading():
