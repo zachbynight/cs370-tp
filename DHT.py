@@ -27,5 +27,10 @@ class Reading:
         self.temperature = temperature
         self.humidity = humidity
     
+    def isInvalid(self):
+        return self.temperature == None or self.humidity == None
+    
     def __str__(self):
+        if self.isInvalid():
+            return "Invalid reading."
         return f"Temperature: {self.temperature:.2f} C, Humidity: {self.humidity:.2f}"

@@ -12,6 +12,9 @@ def main():
     SERVER_IP = sys.argv[1]
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((SERVER_IP, PORT))
+    if s.recv(1) != b'1':
+        print("Connected could not be started")
+        return
     print("Connected")
     while True:
         input_str = input()
