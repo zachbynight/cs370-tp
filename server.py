@@ -3,58 +3,54 @@ import socket
 import board
 import dht
 from events import Event
+import threading
 
-HOST = '0.0.0.0'
+HOST = '127.0.0.1'
 PORT = 5000
 
+connected = None
 
 def main():
-    print("Starting server")
-    sensor = dht.DHT(board.D27)
-    e1 = Event("True", "Humidity is %h%")
-    e2 = Event("humidity>50", "Quite humid", "Not humid")
-    reading = None
-    while reading == None:
-        reading = sensor.read()
-    print(e1.evaluate(reading))
-    print(e2.evaluate(reading))
-
-def setup():
-   pass
-
-def send_data():
     try:
-        temp = pid.temperature
-        hum = pi.humdity 
-        message = f"Temperature: {temp:.1f}F, Humidity: {hum:.1f}%"
+        networking_thread = threading.Thread(target=process_network_requests, args=(), kwargs={})
+        networking_thread.start()
+        print("Starting sensor")
+        sensor = dht.DHT(board.D27)
+    except:
+        print("Error occured")
 
-        #connects with the server device and will send the message as a stream of bytes
-        with sockets.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((SERVER_IP, PORT))
-            s.sendall(message.encode())
-            print(f"Sent {message}")
-
-    except Exception as e:
-        print(f"ERROR: {e}")
-
-
-def old_networking():
-    #This will send the message ever second
-    while true:
-        send_data()
-        time.sleep(60)
-
+def process_network_requests():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        print(f"Starting server @ {socket.gethostname()}")
         s.bind((HOST, PORT))
-        s.listen
+        s.listen()
         print(f"Server listening on {PORT}...")
-
         while True:
-            conn, addr = s.accept
-            with conn:
-                print(f"Connected by {addr}")
-                data = conn.recv(1024)
-                if data:
-                    print(f"Received Sensor Data: {data.decode()}")
+            connected_socket, address = s.accept()
+            try:
+                handle_connection(connected_socket, address)
+            except Exception as e:
+                print(f"Error occurred while connected to {address}: {e}")
+
+def handle_connection(connected_socket, address):
+    print(f"Connected to {address}")
+    while True:
+        connected_socket.send(b'1')
+        decoded = handle_message(connected_socket, address)
+        if decoded == "exit":
+            break
+    connected_socket.close()
+
+def handle_message(connected_socket, address):
+    data = connected_socket.recv(1024)
+    if not data:
+        return ""
+    decoded = data.decode()
+    print(f"Received Instruction Data: {decoded}")
+    return decoded
+
+
+
+
                     
 main()
